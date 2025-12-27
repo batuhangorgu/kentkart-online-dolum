@@ -38,7 +38,7 @@
       font-size: 14px;
     }
 
-    input, select, button {
+    input, select {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -47,10 +47,14 @@
     }
 
     button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
       background: #e30a17;
       color: #fff;
       font-size: 15px;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
 
@@ -59,14 +63,16 @@
     }
 
     .result {
-      margin-top: 15px;
+      margin-top: 12px;
       text-align: center;
       font-weight: bold;
-      color: green;
     }
 
+    .success { color: green; }
+    .error { color: red; }
+
     .balance {
-      margin-top: 20px;
+      margin-top: 25px;
       padding-top: 15px;
       border-top: 1px solid #ddd;
     }
@@ -77,11 +83,11 @@
 
 <div class="container">
   <h2>İstanbulkart Online Dolum</h2>
-  <div class="demo">⚠️ DEMO – Gerçek ödeme yapılmaz</div>
+  <div class="demo">⚠️ DEMO – Gerçek ödeme yoktur</div>
 
   <!-- DOLUM -->
   <label>16 Haneli İstanbulkart No</label>
-  <input id="kartNo" maxlength="16" placeholder="1234567890123456">
+  <input type="text" id="kartNo" maxlength="16" placeholder="1234567890123456">
 
   <label>Dolum Tutarı</label>
   <select id="tutar">
@@ -91,35 +97,65 @@
     <option value="200">200 TL</option>
   </select>
 
-  <button onclick="odemeYap()">Ödeme Yap</button>
+  <button id="odemeBtn">Ödeme Yap</button>
 
-  <div id="sonuc" class="result"></div>
+  <div id="odemeSonuc" class="result"></div>
 
-  <!-- BAKİYE SORGULA -->
+  <!-- BAKİYE -->
   <div class="balance">
     <h3>Bakiye Sorgula</h3>
 
     <label>İstanbulkart No</label>
-    <input id="sorguNo" maxlength="16" placeholder="1234567890123456">
+    <input type="text" id="sorguNo" maxlength="16" placeholder="1234567890123456">
 
-    <button onclick="bakiyeSorgula()">Bakiye Sorgula</button>
+    <button id="sorguBtn">Bakiye Sorgula</button>
 
     <div id="bakiyeSonuc" class="result"></div>
   </div>
 </div>
 
 <script>
-  // Kart bakiyelerini tutan demo obje
+  // DEMO için kart bakiyeleri
   var bakiyeler = {};
 
-  function odemeYap() {
-    var kartNo = document.getElementById("kartNo").value;
+  document.getElementById("odemeBtn").addEventListener("click", function () {
+    var kartNo = document.getElementById("kartNo").value.trim();
     var tutar = parseInt(document.getElementById("tutar").value);
 
     if (kartNo.length !== 16 || isNaN(kartNo)) {
-      alert("Geçerli 16 haneli kart numarası giriniz");
+      document.getElementById("odemeSonuc").innerHTML =
+        "<span class='error'>❌ Geçerli 16 haneli kart numarası girin</span>";
       return;
     }
 
     if (!bakiyeler[kartNo]) {
       bakiyeler[kartNo] = 0;
+    }
+
+    bakiyeler[kartNo] += tutar;
+
+    document.getElementById("odemeSonuc").innerHTML =
+      "<span class='success'>✅ Ödeme alındı. Yüklenen tutar: " + tutar + " TL</span>";
+  });
+
+  document.getElementById("sorguBtn").addEventListener("click", function () {
+    var kartNo = document.getElementById("sorguNo").value.trim();
+
+    if (kartNo.length !== 16 || isNaN(kartNo)) {
+      document.getElementById("bakiyeSonuc").innerHTML =
+        "<span class='error'>❌ Geçerli 16 haneli kart numarası girin</span>";
+      return;
+    }
+
+    if (bakiyeler[kartNo] !== undefined) {
+      document.getElementById("bakiyeSonuc").innerHTML =
+        "<span class='success'>💳 Güncel Bakiye: " + bakiyeler[kartNo] + " TL</span>";
+    } else {
+      document.getElementById("bakiyeSonuc").innerHTML =
+        "<span class='error'>⚠️ Bu karta ait bakiye bulunamadı</span>";
+    }
+  });
+</script>
+
+</body>
+</html>
